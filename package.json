@@ -9,7 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "compile": "npx pkg index.js --target node18-win --output server.exe"
+    "compile": "npx pkg index.js --target node18-win --output dist/server.exe"
   },
   "keywords": [],
   "author": "",
