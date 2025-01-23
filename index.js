@@ -1,3 +1,4 @@
+const yargs = require("yargs");
 const osPath = require("path");
 const express = require("express");
 const { writeFile, getFiles, getSettings } = require("./lib/utils");
@@ -8,8 +9,24 @@ const CONFIG_DATA = {
     imageExt: [".png", ".jpg"]
 }
 
-const SETTINGS = getSettings()
+const test = ``
 
+function checkArgs() {
+    const args = yargs.option("settings", {
+        describe: "path to setting file to override local one",
+        type: "string"
+    }).argv['_'][0];
+
+    if (!args) return undefined;
+
+    return JSON.parse(args);
+}
+
+const args = checkArgs();
+console.log(args);
+
+
+const SETTINGS = args == undefined || args == null? getSettings() : args;
 
 if (SETTINGS.allowList.length == 0) throw new Error("audioPaths not configured in settings.json");
 
