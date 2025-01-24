@@ -1,15 +1,13 @@
 const yargs = require("yargs");
 const osPath = require("path");
 const express = require("express");
-const { writeFile, getFiles, getSettings } = require("./lib/utils");
+const { writeFile, getFiles, getSettings, getIpAddress } = require("./lib/utils");
 
 const CONFIG_DATA = {
     filetypes: ["images", "audio"],
     audioExt: [".mp3"],
     imageExt: [".png", ".jpg"]
 }
-
-const test = ``
 
 function checkArgs() {
     const args = yargs.option("settings", {
@@ -23,8 +21,6 @@ function checkArgs() {
 }
 
 const args = checkArgs();
-console.log(args);
-
 
 const SETTINGS = args == undefined || args == null? getSettings() : args;
 
@@ -40,6 +36,8 @@ async function filetypeChecker(req, res, next) {
 
     next();
 }
+
+// TODO: impl key checker
 
 const app = express();
 
@@ -157,8 +155,15 @@ app.route("/api/:filetype")
         }
     })
 
-app.listen(9090, ()=>{
-    console.log("Server is running on port 9090");
+
+app.listen(SETTINGS.server.port, SETTINGS.server.host,()=>{
+    let address = '';
+    if (SETTINGS.server.host == "0.0.0.0") {
+        address = `http://${getIpAddress()}:${SETTINGS.server.port}`
+    }else {
+        address = `http://localhost:${SETTINGS.server.port}`
+    }
+    console.log(`Server is running on ${address}`);
 })
 
 module.exports = {
