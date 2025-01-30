@@ -13,8 +13,6 @@ async function filetypeChecker(req, res, next) {
     next();
 }
 
-// TODO: impl key checker
-
 module.exports = {
     filetypeChecker,
 }

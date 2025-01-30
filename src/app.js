@@ -1,10 +1,10 @@
-
+require("dotenv").config();
 const express = require("express");
 
 const { getSettings } = require("./lib/utils.js");
 
 // routers
-const {homeRouter, folderRouter, filesRouter} = require("./routes/");
+const {homeRouter, folderRouter, filesRouter, settingsRouter} = require("./routes/");
 
 const SETTINGS = getSettings();
 
@@ -20,6 +20,9 @@ app.use("/", homeRouter);
 
 // ------------------- folder check ------------------- 
 app.use("/", folderRouter);
+
+// ------------------- settings routes -------------------
+app.use("/", settingsRouter);
 
 // ------------------- file data routes ------------------- 
 app.use("/", filesRouter)

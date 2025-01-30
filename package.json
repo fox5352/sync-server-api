@@ -8,8 +8,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./src/server.js",
-    "dev": "nodemon ./src/server.js",
-    "compile": "npx pkg index.js --target node18-linux-x64,node18-macos-x64,node18-win-x64 --output dist/server.exe"
+    "dev": "TOKEN='testing' nodemon ./src/server.js",
+    "compile": "npx pkg ./src/server.js --target node18-linux-x64,node18-macos-x64,node18-win-x64 --output dist/server.exe"
   },
   "keywords": [],
   "author": "",

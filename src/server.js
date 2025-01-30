@@ -4,6 +4,8 @@ const { getSettings } = require("./lib/utils.js")
 
 const SETTINGS = getSettings();
 
+// TODO: get env from process called token
+
 const server = http.createServer(app);
 
 server.listen(SETTINGS.server.port, SETTINGS.server.host,()=>{
