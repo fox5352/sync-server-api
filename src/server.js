@@ -1,6 +1,7 @@
 const http = require("http");
-const { app } = require("./app");
-const { getSettings } = require("./lib/utils.js")
+const { join } = require("path");
+const { app } = require(join(__dirname, "app"));
+const { getSettings } = require(join(__dirname, "lib","utils.js"))
 
 const SETTINGS = getSettings();
 

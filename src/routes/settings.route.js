@@ -1,5 +1,7 @@
 const { Router } = require("express");
-const {checker, GET, PUT} = require("../controllers/settings.controller");
+const { join } = require("path");
+
+const {checker, GET, PUT} = require(join(__dirname, "..", "controllers","settings.controller.js"));
 
 const settingsRouter = Router();
 

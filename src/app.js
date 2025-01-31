@@ -1,7 +1,8 @@
 require("dotenv").config();
 const express = require("express");
+const { join } =require("path");
 
-const { getSettings } = require("./lib/utils.js");
+const { getSettings } = require(join(__dirname,"lib","utils.js"));
 
 // routers
 const {homeRouter, folderRouter, filesRouter, settingsRouter} = require("./routes/");

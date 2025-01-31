@@ -1,6 +1,8 @@
 const { Router } = require("express");
-const { filetypeChecker } = require("../middleware.js");
-const { GET,POST } = require("../controllers/files.controller");
+const { join } = require("path");
+
+const { filetypeChecker } = require(join(__dirname,"..","middleware.js"));
+const { GET,POST } = require(join(__dirname,"..","controllers","files.controller.js"));
 
 const filesRouter = Router();
 
