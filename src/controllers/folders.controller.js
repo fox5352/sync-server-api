@@ -1,5 +1,5 @@
 const osPath = require("path");
-const { getSettings } = require(osPath.join(__dirname, "..","lib","utils.js"));
+const { getSettings } = require("../lib/utils.js");
 
 const SETTINGS = getSettings();
 

@@ -1,7 +1,6 @@
 const { Router } = require("express");
-const { join } =require("path");
 
-const { GET } =require(join(__dirname, "..","controllers","folders.controller.js"));
+const { GET } =require("../controllers/folders.controller.js");
 
 const folderRouter = Router();
 

@@ -1,7 +1,6 @@
 const { Router } = require("express");
-const { join } = require("path");
 
-const { GET } = require(join(__dirname,"..","controllers", "home.controller.js"));
+const { GET } = require("../controllers/home.controller.js");
 
 const homeRouter = Router();
 
