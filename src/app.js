@@ -1,10 +1,11 @@
 require("dotenv").config();
 const express = require("express");
+const cors = require("cors");
 
 const { getSettings } = require("./lib/utils");
 
 // routers
-const {homeRouter, folderRouter, filesRouter, settingsRouter} = require("./routes/");
+const { homeRouter, folderRouter, filesRouter, settingsRouter } = require("./routes/");
 
 const SETTINGS = getSettings();
 
@@ -13,20 +14,22 @@ if (SETTINGS.allowList.length == 0) throw new Error("audioPaths not configured i
 
 const app = express();
 
+app.use(cors("*"))
+
 app.use(express.json());
 
-// ------------------- sync route ------------------- 
+// ------------------- sync route -------------------
 app.use("/", homeRouter);
 
-// ------------------- folder check ------------------- 
+// ------------------- folder check -------------------
 app.use("/", folderRouter);
 
 // ------------------- settings routes -------------------
 app.use("/", settingsRouter);
 
-// ------------------- file data routes ------------------- 
+// ------------------- file data routes -------------------
 app.use("/", filesRouter)
 
 module.exports = {
     app,
- };
+};
