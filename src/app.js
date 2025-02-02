@@ -14,7 +14,10 @@ if (SETTINGS.allowList.length == 0) throw new Error("audioPaths not configured i
 
 const app = express();
 
-app.use(cors("*"))
+app.use(cors({
+    origin: "*",
+    optionsSuccessStatus: 200,
+}))
 
 app.use(express.json());
 
