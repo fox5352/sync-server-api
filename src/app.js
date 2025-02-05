@@ -10,7 +10,10 @@ const { homeRouter, folderRouter, filesRouter, settingsRouter } = require("./rou
 const SETTINGS = getSettings();
 
 
-if (SETTINGS.allowList.length == 0) throw new Error("audioPaths not configured in settings.json");
+if (SETTINGS.allowList.length == 0) console.error("audioPaths not configured in settings.json");
+
+if (SETTINGS.imagePaths.length == 0) console.error("imagePaths not configured in settings.json");
+
 
 const app = express();
 

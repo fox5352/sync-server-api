@@ -124,7 +124,7 @@ function getSettings() {
     let audioExt = ["mp3"];
 
     let server = {
-        host: "localhost",
+        host: "0.0.0.0",
         port: 9090,
     }
     let key = undefined;
@@ -165,8 +165,6 @@ function updateSettings(newSettings) {
     const settingsPath = path.join(runningDir, "settings.json");
 
     const oldSettings = getSettings();
-
-    console.log({...oldSettings, ...newSettings});
 
     const updatedSettings = {
        ...oldSettings,
