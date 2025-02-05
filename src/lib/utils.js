@@ -166,6 +166,8 @@ function updateSettings(newSettings) {
 
     const oldSettings = getSettings();
 
+    console.log({...oldSettings, ...newSettings});
+
     const updatedSettings = {
        ...oldSettings,
        ...newSettings,

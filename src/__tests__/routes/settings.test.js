@@ -41,7 +41,7 @@ describe('API Test in settings route', () => {
         expect(response.body.data.settings.server).toHaveProperty('port');
     });
 
-    test('PUT /api/settings', async() => {
+    test('POST /api/settings', async() => {
         const updatedSettings = {
             imageExt: ['.jpg', '.png'],
             audioExt: ['.mp3', '.wav'],
@@ -49,7 +49,7 @@ describe('API Test in settings route', () => {
 
         const ogSettings = await block.get("/api/settings").set('Authorization', token);
 
-        const response = await block.put("/api/settings").send({ settings: updatedSettings }).set('Authorization', token);
+        const response = await block.post("/api/settings").send({ settings: updatedSettings }).set('Authorization', token);
 
         expect(response.status).toBe(200);
 
@@ -68,6 +68,6 @@ describe('API Test in settings route', () => {
         expect(response.body.message).toBe("Settings updated successfully");
 
 
-        await block.put("/api/settings").send({ settings: ogSettings }).set('Authorization', token);
+        await block.post("/api/settings").send({ settings: ogSettings }).set('Authorization', token);
     })
 })

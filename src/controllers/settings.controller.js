@@ -24,7 +24,7 @@ async function GET(req, res) {
     });
 }
 
-async function PUT(req, res) {
+async function POST(req, res) {
     const updatedSettings = req.body.settings;
 
     const settings = getSettings();
@@ -35,7 +35,7 @@ async function PUT(req, res) {
     }
     
     try {
-        updateSettings(newSettings);
+        updateSettings(newSettings);      
 
         res.json({
             data: {
@@ -43,6 +43,7 @@ async function PUT(req, res) {
             },
             message: "Settings updated successfully"
         });
+
     } catch (error) {
         res.status(500).json({message: "Failed to update settings: " + error.message});
     }
@@ -51,5 +52,5 @@ async function PUT(req, res) {
 module.exports = {
     checker,
     GET,
-    PUT
+    POST
 }

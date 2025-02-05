@@ -19,7 +19,9 @@ app.use(cors({
     optionsSuccessStatus: 200,
 }))
 
+// Add this middleware to parse JSON body
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // ------------------- sync route -------------------
 app.use("/", homeRouter);
