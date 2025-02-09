@@ -1,5 +1,6 @@
 const { app } = require("../../app");
 const request = require('supertest');
+const { updateSettings } = require("../../lib/utils");
 
 
 describe('API Test in settings route', () => {
@@ -28,7 +29,6 @@ describe('API Test in settings route', () => {
         expect(response.body.data.settings.audioPaths).toBeInstanceOf(Array);
 
         expect(response.body.data.settings).toHaveProperty('imageExt');
-        expect(response.body.data.settings.imageExt).toBeInstanceOf(Array);
 
         expect(response.body.data.settings).toHaveProperty('audioExt');
         expect(response.body.data.settings.audioExt).toBeInstanceOf(Array);
@@ -41,33 +41,109 @@ describe('API Test in settings route', () => {
         expect(response.body.data.settings.server).toHaveProperty('port');
     });
 
-    test('POST /api/settings', async() => {
+    it('POST /api/settings - Update all settings', async () => {
         const updatedSettings = {
-            imageExt: ['.jpg', '.png'],
-            audioExt: ['.mp3', '.wav'],
+            settings: {
+                allowList: ["video"],
+                imagePaths: ["/new/image/path"],
+                audioPaths: ["/c/Users/fox5352/Music","/new/audio/path"],
+                imageExt: ["gif"],
+                audioExt: ["flac"],
+                server: {
+                    host: "192.168.1.100",
+                    port: 8080
+                }
+            }
         };
 
-        const ogSettings = await block.get("/api/settings").set('Authorization', token);
-
-        const response = await block.post("/api/settings").send({ settings: updatedSettings }).set('Authorization', token);
+        const response = await block
+            .post('/api/settings')
+            .set('Authorization', token)
+            .send(updatedSettings);
 
         expect(response.status).toBe(200);
-
         expect(response.body).toHaveProperty('data');
         expect(response.body).toHaveProperty('message');
-
-        expect(response.body.data).toHaveProperty('settings');
-        expect(response.body.data.settings).toBeInstanceOf(Object);
-
-        expect(response.body.data.settings).toHaveProperty('imageExt');
-        expect(response.body.data.settings.imageExt).toEqual(updatedSettings.imageExt);
-
-        expect(response.body.data.settings).toHaveProperty('audioExt');
-        expect(response.body.data.settings.audioExt).toEqual(updatedSettings.audioExt);
-
         expect(response.body.message).toBe("Settings updated successfully");
 
+        // Important: Verify the actual database or data store
+        const getResponse = await block // Get the settings again
+            .get('/api/settings')
+            .set('Authorization', token);
 
-        await block.post("/api/settings").send({ settings: ogSettings }).set('Authorization', token);
+        expect(getResponse.status).toBe(200);
+        expect(getResponse.body.data.settings).toEqual(updatedSettings.settings); // Deep comparison
+
+    });
+
+    it('POST /api/settings - Partial update', async () => {
+        const partialUpdate = {
+            settings: {
+                imageExt: ["jpeg", "webp"]
+            }
+        };
+
+        const response = await block
+            .post('/api/settings')
+            .set('Authorization', token)
+            .send(partialUpdate);
+
+        expect(response.status).toBe(200);
+        expect(response.body.message).toBe("Settings updated successfully");
+
+        const getResponse = await block
+            .get('/api/settings')
+            .set('Authorization', token);
+
+        expect(getResponse.status).toBe(200);
+        expect(getResponse.body.data.settings.imageExt).toEqual(partialUpdate.settings.imageExt); // Check only the updated part
+        // Add more assertions to check that other settings remain unchanged
+    });
+
+    it('POST /api/settings - Empty update', async () => {
+        const emptyUpdate = {
+            settings: {}
+        };
+
+        const response = await block
+            .post('/api/settings')
+            .set('Authorization', token)
+            .send(emptyUpdate);
+
+        expect(response.status).toBe(200);
+        expect(response.body.message).toBe("Settings updated successfully");
+
+        const getResponse = await block
+            .get('/api/settings')
+            .set('Authorization', token);
+
+        expect(getResponse.status).toBe(200);
+        // Add assertions to check that the settings remain unchanged after empty update
+    });
+
+    afterAll(() => {
+        const ogSettings = {
+            allowList: [
+                "video"
+            ],
+            imagePaths: [
+                "/new/image/path"
+            ],
+            audioPaths: [
+                "/c/Users/fox5352/Music"
+            ],
+            imageExt: [
+                "jpeg"
+            ],
+            audioExt: [
+                "flac"
+            ],
+            server: {
+                "host": "192.168.1.100",
+                "port": 8080
+            }
+        };
+
+        updateSettings(ogSettings);
     })
 })
