@@ -1,10 +1,7 @@
-
 const path = require("path");
 const os = require("os");
 const fs = require("node:fs/promises");
 const { readFileSync, writeFileSync, appendFileSync } = require("node:fs")
-
-
 
 function getIpAddress() {
 
@@ -123,6 +120,9 @@ function getSettings() {
     let audioPaths = [];
     let audioExt = ["mp3"];
 
+    let videoPaths = [];
+    let videoExt= ["mkv", "mp4"];
+
     let server = {
         host: "0.0.0.0",
         port: 9090,
@@ -136,8 +136,10 @@ function getSettings() {
             allowList: settings.allowList || allowList,
             imagePaths: settings.imagePaths || imagePaths,
             audioPaths: settings.audioPaths || audioPaths,
+            videoPaths: settings.videoPaths || videoPaths,
             imageExt: settings.imageExt || imageExt,
             audioExt: settings.audioExt || audioExt,
+            videoExt: settings.videoExt || videoExt,
             server: settings.server || server,
             key: settings.key || key,
         };
@@ -147,8 +149,10 @@ function getSettings() {
             allowList,
             imagePaths,
             audioPaths,
+            videoPaths,
             imageExt,
             audioExt,
+            videoExt,
             server,
             key,
         };

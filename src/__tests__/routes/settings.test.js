@@ -47,10 +47,19 @@ describe('API Test in settings route', () => {
                 allowList: ["video"],
                 imagePaths: ["/new/image/path"],
                 audioPaths: ["/c/Users/fox5352/Music","/new/audio/path"],
-                imageExt: ["gif"],
-                audioExt: ["flac"],
+                videoPaths: [],
+                imageExt: [
+                    "jpeg"
+                ],
+                audioExt: [
+                    "flac"
+                ],
+                videoExt: [
+                    "mkv",
+                    "mp4"
+                ],
                 server: {
-                    host: "192.168.1.100",
+                host: "0.0.0.0",
                     port: 8080
                 }
             }
@@ -124,23 +133,28 @@ describe('API Test in settings route', () => {
     afterAll(() => {
         const ogSettings = {
             allowList: [
-                "video"
+                "audio", "image", 'video'
             ],
             imagePaths: [
-                "/new/image/path"
+                "./"
             ],
             audioPaths: [
-                "/c/Users/fox5352/Music"
+                "./"
             ],
+            videoPaths: [],
             imageExt: [
-                "jpeg"
+                "jpg"
             ],
             audioExt: [
-                "flac"
+                "mp3"
+            ],
+            videoExt: [
+                "mkv",
+                "mp4"
             ],
             server: {
-                "host": "192.168.1.100",
-                "port": 8080
+                host: "0.0.0.0",
+                port: 8080
             }
         };
 
