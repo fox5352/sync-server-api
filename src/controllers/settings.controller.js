@@ -1,3 +1,4 @@
+require("dotenv").config();
 const { getSettings, updateSettings }  = require("../lib/utils");
 
 function checker(req, res, next) {

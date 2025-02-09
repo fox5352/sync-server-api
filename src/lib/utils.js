@@ -1,3 +1,4 @@
+
 const path = require("path");
 const os = require("os");
 const fs = require("node:fs/promises");
@@ -26,7 +27,6 @@ function getIpAddress() {
   return 'No IPv4 address found';
 
 }
-
 
 function logToFile(message) {
     if (!process.env.DEBUG == "true") return;
