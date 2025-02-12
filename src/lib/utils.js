@@ -1,6 +1,5 @@
 const path = require("path");
 const os = require("os");
-const fs = require("node:fs/promises");
 const { readFileSync, writeFileSync, appendFileSync } = require("node:fs")
 
 function getIpAddress() {
@@ -30,62 +29,6 @@ function logToFile(message) {
     
     const logPath = path.join(process.pkg ? path.dirname(process.execPath) : process.cwd(), 'server.log');
     appendFileSync(logPath, `${new Date().toISOString()} - ${message}\n`);
-}
-
-/**
- * Retrieves a list of files from a specified directory.//+
- * //+
- * @async//+
- * @param {string} dirPath - The path to the directory to read files from.//+
- * @returns {Promise<Array<Object|null>>} A promise that resolves to an array of file objects.//+
- *                                   Each object contains://+
- *                                   - name: The name of the file.//+
- *                                   - path: The full path to the file.//+
- *                                   - extension: The file extension.//+
- *///
-async function getFiles(dirPath) {
-    try {
-        if (!dirPath) {
-            throw new Error("Directory path is required");
-        }
-        
-
-        const entries = await fs.readdir(dirPath, { withFileTypes: true });
-
-        return entries
-            .filter(entry => entry.isFile())
-            .map(entry => ({
-                name: entry.name.split(".")[0],
-                path: path.join(dirPath, entry.name),
-                extension: path.extname(entry.name)
-            }));
-    } catch (error) {
-        console.error(`Failed to read directory ${dirPath}: ${error.message}`);
-        return null
-    }
-}
-
-async function writeFile(dirPath, name, extension, data) {
-    try {
-        if (!name || !extension) {
-            throw new Error("Name and extension are required");
-        }
-        if (!data) {
-            throw new Error("Data is required");
-        }
-        if (!dirPath) {
-            throw new Error("Directory path is required");
-        }
-
-        const fullPath = path.join(dirPath, `${name}.${extension}`);
-
-        // The key change: specify 'binary' or 'buffer' encoding
-        await fs.writeFile(fullPath, data, { encoding: 'binary' }); // Or { encoding: 'buffer' }
-
-        return true;
-    } catch (error) {
-        throw new Error(`Failed to write file ${fullPath}: ${error.message}`);
-    }
 }
 
 
@@ -189,8 +132,6 @@ function updateSettings(newSettings) {
 module.exports = {
     getIpAddress,
     logToFile,
-    getFiles,
-    writeFile,
     getSettings,
     updateSettings,
 };

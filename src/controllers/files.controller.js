@@ -1,18 +1,17 @@
-const { getSettings, getFiles, writeFile } = require("../lib/utils");
+const { getSettings } = require("../lib/utils");
+const {getFiles, writeFile, getFileMetadata} = require("../lib/fileManagement");
 
 const SETTINGS = getSettings();
 
 
 // helpers
 /**
- * 
-  
  * @param {string} path 
  */
 function getFolderName(path) {
-    const splitPath = path.split("/");
-
-    return splitPath[splitPath.length - 1];
+    const splitPath = path.trim().split(/[\/\\]/).filter(item => item !== "");
+    folderName = splitPath[splitPath.length - 1]
+    return folderName == "."? "root" : folderName;
 }
 
 async function GET(req,res) {
@@ -21,9 +20,7 @@ async function GET(req,res) {
     let buffer = [];
 
     try {
-        const pathsList = SETTINGS[filetype + "Paths"];
-        console.log(filetype + "Paths", pathsList);
-        
+        const pathsList = SETTINGS[filetype + "Paths"];        
 
         for (const path of pathsList) {
 
@@ -42,6 +39,15 @@ async function GET(req,res) {
                         return false;
                 }
             })
+            
+            for (let idx = 0; idx < filteredFiles.length; idx++) {
+                const metaData = await getFileMetadata(filteredFiles[idx].path);
+
+                filteredFiles[idx] = {
+                    ...filteredFiles[idx],
+                    metadata:metaData
+                }
+            }
 
             const folderName = getFolderName(path);
 
