@@ -5,6 +5,8 @@ const SETTINGS = getSettings();
 
 // helpers
 /**
+ * 
+  
  * @param {string} path 
  */
 function getFolderName(path) {
@@ -19,17 +21,25 @@ async function GET(req,res) {
     let buffer = [];
 
     try {
-        for (const path of SETTINGS.audioPaths) {
+        const pathsList = SETTINGS[filetype + "Paths"];
+        console.log(filetype + "Paths", pathsList);
+        
+
+        for (const path of pathsList) {
 
             const files = await getFiles(path);
 
             const filteredFiles = files.filter(item=> {
-                if (filetype == "audio") {                     
-                    return SETTINGS.audioExt.includes(item.extension.replace(".", "").toLowerCase())? true : false;
-                }else if (filetype == "image") {
-                    return SETTINGS.imageExt.includes(item.extension.replace(".", "").toLowerCase())? true : false;
-                }else {
-                    return false;
+                switch (filetype) {
+                    case "audio":{
+                        return SETTINGS.audioExt.includes(item.extension.replace(".", "").toLowerCase())? true : false;
+                    }case "image":{
+                        return SETTINGS.imageExt.includes(item.extension.replace(".", "").toLowerCase())? true : false;
+                    }case "video": {
+                        return SETTINGS.videoExt.includes(item.extension.replace(".", "").toLowerCase())? true : false;
+                    }
+                    default:
+                        return false;
                 }
             })
 
