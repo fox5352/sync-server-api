@@ -21,7 +21,11 @@ async function GET(req,res) {
     let buffer = [];
 
     try {
-        for (const path of SETTINGS.audioPaths) {
+        const pathsList = SETTINGS[filetype + "Paths"];
+        console.log(filetype + "Paths", pathsList);
+        
+
+        for (const path of pathsList) {
 
             const files = await getFiles(path);
 
