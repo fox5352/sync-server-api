@@ -40,7 +40,7 @@ async function GET(req,res) {
                 }
             })
             
-            for (let idx = 0; idx < filteredFiles.length; idx++) {
+            for (let idx = 0; idx < filteredFiles.length; idx++) {                
                 const metaData = await getFileMetadata(filteredFiles[idx].path);
 
                 filteredFiles[idx] = {

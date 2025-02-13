@@ -1,13 +1,7 @@
-const os = require('os');
 const path = require('path');
-const sharp = require('sharp');
-const crypto = require('crypto');
-const { promisify } = require('util');
+// const sharp = require('sharp');
 const fs = require("node:fs/promises");
 const { parseFile } = require("music-metadata");
-
-const { execFile } = require('child_process');
-const execFileAsync = promisify(execFile);
 
 async function getMimeType(buffer) {
     // Magic numbers for common file types
@@ -35,10 +29,8 @@ async function getMimeType(buffer) {
 
 async function getAudioDuration(path) {
     try {
-        console.log(path);
         
         const metaData = await parseFile(path)
-        console.log(metaData);
         
 
         return {
@@ -51,45 +43,15 @@ async function getAudioDuration(path) {
     }
 }
 
-async function generateThumbnailBuffer(filePath, mimeType, buffer) {
+async function generateThumbnailBuffer(imagePath, width=155, height=155) {
     try {
-        if (mimeType.startsWith('image/')) {
-            // For images, use Sharp
-            return await sharp(buffer)
-                .resize(255, 255, {
-                    fit: 'inside',
-                    withoutEnlargement: true
-                })
-                .jpeg()
-                .toBuffer();
-        } else if (mimeType.startsWith('video/')) {
-            // For videos still need ffmpeg
-            try {
-                const tempDir = os.tmpdir();
-                const tempFileName = `thumb_${crypto.randomBytes(16).toString('hex')}.jpg`;
-                const tempFilePath = path.join(tempDir, tempFileName);
+        const file = Buffer.from(await fs.readFile(imagePath));
 
-                await execFileAsync('ffmpeg', [
-                    '-i', filePath,
-                    '-vf', 'scale=255:255:force_original_aspect_ratio=decrease',
-                    '-frames:v', '1',
-                    '-y',
-                    tempFilePath
-                ]);
-
-                const thumbnailBuffer = await fs.readFile(tempFilePath);
-                await fs.unlink(tempFilePath).catch(() => {});
-                return thumbnailBuffer;
-            } catch (error) {
-                console.error('Error generating video thumbnail:', error);
-                return null;
-            }
-        }
-        return null;
-    } catch (error) {
-        console.error('Error generating thumbnail:', error);
-        return null;
-    }
+        return file;
+  } catch (err) {
+    console.error('Error creating thumbnail:', err);
+    return null; // Re-throw the error for handling elsewhere if needed.
+  }
 }
 
 async function getFileMetadata(filePath) {
@@ -105,12 +67,13 @@ async function getFileMetadata(filePath) {
             type: mimeType
         };
 
-        console.log(mimeType);
         
 
-        // Generate thumbnails for images and videos
-        if (mimeType.startsWith('image/') || mimeType.startsWith('video/')) {
-            const thumbnailBuffer = await generateThumbnailBuffer(filePath, mimeType, buffer);
+        // Generate thumbnails for images and videos 
+        // FIX: impl image processing package
+        if (mimeType.startsWith('image/')) {
+            const thumbnailBuffer = await generateThumbnailBuffer(filePath);
+
             if (thumbnailBuffer) {
                 metadata = {
                     ...metadata,
@@ -118,7 +81,6 @@ async function getFileMetadata(filePath) {
                         thumbnail: thumbnailBuffer
                     }
                 }
-                // metadata.thumbnail = thumbnailBuffer;
             }
         }
 
