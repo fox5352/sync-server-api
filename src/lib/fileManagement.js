@@ -2,7 +2,6 @@ const path = require('path');
 // const sharp = require('sharp');
 const fs = require("node:fs/promises");
 const { parseFile } = require("music-metadata");
-const { stat } = require('node:fs');
 
 async function getMimeType(buffer) {
     // Magic numbers for common file types
