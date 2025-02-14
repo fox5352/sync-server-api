@@ -2,6 +2,7 @@ const path = require('path');
 // const sharp = require('sharp');
 const fs = require("node:fs/promises");
 const { parseFile } = require("music-metadata");
+const { stat } = require('node:fs');
 
 async function getMimeType(buffer) {
     // Magic numbers for common file types
@@ -57,8 +58,14 @@ async function generateThumbnailBuffer(imagePath, width=155, height=155) {
 async function getFileMetadata(filePath) {
     try {
         const stats = await fs.stat(filePath);
-        const buffer = await fs.readFile(filePath);
-        const mimeType = await getMimeType(buffer);
+
+        let buffer=null;
+        let mimeType=null;
+
+        if (stats.size < 204_800) {
+            buffer = await fs.readFile(filePath);
+            mimeType = await getMimeType(buffer);
+        }
 
         let metadata = {
             size: stats.size,
@@ -67,11 +74,11 @@ async function getFileMetadata(filePath) {
             type: mimeType
         };
 
-        
+        if (mimeType == null) return metadata;
 
         // Generate thumbnails for images and videos 
         // FIX: impl image processing package
-        if (mimeType.startsWith('image/')) {
+        if (mimeType.startsWith('image/')) {            
             const thumbnailBuffer = await generateThumbnailBuffer(filePath);
 
             if (thumbnailBuffer) {
