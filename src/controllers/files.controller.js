@@ -1,3 +1,4 @@
+
 const { getSettings } = require("../lib/utils");
 const {getFiles, writeFile, getFileMetadata} = require("../lib/fileManagement");
 
@@ -41,7 +42,7 @@ async function GET(req,res) {
             })
             
             for (let idx = 0; idx < filteredFiles.length; idx++) {                
-                const metaData = await getFileMetadata(filteredFiles[idx].path);
+                const metaData = await getFileMetadata(filteredFiles[idx].path, filetype);
 
                 filteredFiles[idx] = {
                     ...filteredFiles[idx],
