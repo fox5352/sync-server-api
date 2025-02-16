@@ -6,6 +6,7 @@ const { getSettings } = require("./lib/utils");
 
 // routers
 const { homeRouter, folderRouter, filesRouter, settingsRouter } = require("./routes/");
+const fileRouter = require("./routes/file.route");
 
 const SETTINGS = getSettings();
 
@@ -37,6 +38,9 @@ app.use("/", settingsRouter);
 
 // ------------------- file data routes -------------------
 app.use("/", filesRouter)
+
+app.use("/", fileRouter);
+
 
 module.exports = {
     app,

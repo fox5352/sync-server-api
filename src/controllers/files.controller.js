@@ -8,6 +8,7 @@ const SETTINGS = getSettings();
 // helpers
 /**
  * @param {string} path 
+ * @returns {string}
  */
 function getFolderName(path) {
     const splitPath = path.trim().split(/[\/\\]/).filter(item => item !== "");
@@ -95,6 +96,7 @@ async function POST(req,res) {
         res.status(500).json({message: "failed to save file"})
     }
 }
+
 
 module.exports = {
     GET,
