@@ -1,9 +1,7 @@
-
 const path = require('path');
 // const sharp = require('sharp');
 const fs = require("node:fs/promises");
 const { parseFile } = require("music-metadata");
-const { stat } = require('node:fs');
 
 async function getMimeType(buffer) {
     // Magic numbers for common file types
@@ -100,6 +98,20 @@ async function getFileMetadata(filePath, type) {
 }
 
 // ------------------------------------------------------------------------------------------
+
+async function readFileData(filePath) {
+    try {
+        if (!filePath) throw new Error("File path is required");
+
+        const fileData = await fs.readFile(filePath, { encoding: null }); // Or { encoding: 'buffer' }
+
+        return fileData;
+    } catch (error) {
+        console.error("Error reading file:", error);        
+        return null;
+    }
+}
+
 /**
  * Retrieves a list of files from a specified directory.//+
  * //+
@@ -158,6 +170,7 @@ async function writeFile(dirPath, name, extension, data) {
 
 
 module.exports = {
+    readFileData,
     getFiles,
     writeFile,
     getFileMetadata
