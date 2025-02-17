@@ -53,7 +53,7 @@ function getSettings() {
     const settingsPath = path.join(runningDir, "settings.json");
     
     // Add logging
-    logToFile(`Reading settings from: ${settingsPath}`);
+    console.log(`Reading settings from: ${settingsPath}`);
 
     let allowList = [];
 
@@ -121,10 +121,10 @@ function updateSettings(newSettings) {
     try {
         writeFileSync(settingsPath, JSON.stringify(updatedSettings, null, 2), "utf-8");
 
-        logToFile(`Updated settings: ${JSON.stringify(updatedSettings, null, 2)}`);
+        console.log(`Updated settings: ${JSON.stringify(updatedSettings, null, 2)}`);
         return true;
     } catch (error) {
-        logToFile("`Failed to update settings: ${error.message}`")
+        console.log("`Failed to update settings: ${error.message}`")
         return false;
     }
 }
