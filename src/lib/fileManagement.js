@@ -38,7 +38,7 @@ async function getAudioDuration(path) {
             sampleRate: metaData.format.sampleRate
         };
     } catch (error) {
-        // console.error('Error getting audio duration:', error);
+        // logToFile('Error getting audio duration:', error);
         return null;
     }
 }
@@ -49,7 +49,7 @@ async function generateThumbnailBuffer(imagePath, width=155, height=155) {
 
         return file;
   } catch (err) {
-    console.error('Error creating thumbnail:', err);
+    logToFile('Error creating thumbnail:', err);
     return null; // Re-throw the error for handling elsewhere if needed.
   }
 }
@@ -92,7 +92,7 @@ async function getFileMetadata(filePath, type) {
 
         return metadata;
     } catch (error) {
-        console.error('Error processing file:', error);
+        logToFile('Error processing file:', error);
         throw error;
     }
 }
@@ -107,7 +107,7 @@ async function readFileData(filePath) {
 
         return fileData;
     } catch (error) {
-        console.error("Error reading file:", error);        
+        logToFile("Error reading file:", error);        
         return null;
     }
 }
@@ -140,7 +140,7 @@ async function getFiles(dirPath) {
                 extension: path.extname(entry.name)
             }));
     } catch (error) {
-        console.error(`Failed to read directory ${dirPath}: ${error.message}`);
+        logToFile(`Failed to read directory ${dirPath}: ${error.message}`);
         return null
     }
 }

@@ -64,7 +64,7 @@ async function GET(req,res) {
             message: "successfully fetched data from file path"
         })
     } catch (error) {
-        console.error(`failed in ${filetype} GET ${error.message}`);
+        logToFile(`failed in ${filetype} GET ${error.message}`);
         return res.status(500).json({message: `Internal Server Error on attempt ${filetype} fetch`});
     }
 }
@@ -91,7 +91,7 @@ async function POST(req,res) {
         return res.json({message: "file saved successfully"})
 
     } catch (error) {
-        console.error(`failed to save ${filetype} ${error.message}`);
+        logToFile(`failed to save ${filetype} ${error.message}`);
 
         res.status(500).json({message: "failed to save file"})
     }
