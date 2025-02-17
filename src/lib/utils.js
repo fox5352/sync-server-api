@@ -1,6 +1,27 @@
 const path = require("path");
 const os = require("os");
-const { readFileSync, writeFileSync, appendFileSync } = require("node:fs")
+const { readFileSync, writeFileSync, appendFileSync, existsSync, mkdirSync } = require("node:fs")
+
+function getCurrentDirectoryName() {
+    const runningDir = process.pkg ? path.dirname(process.execPath) : process.cwd();
+    return path.basename(runningDir);
+}
+
+function getAppDataPath() {
+
+  const homedir = os.homedir();
+
+  if (process.platform === 'win32') {
+
+    return `${homedir}\\AppData\\Roaming`;
+
+  } else {
+
+    return `${homedir}/.config`;
+
+  }
+
+}
 
 function getIpAddress() {
 
@@ -26,11 +47,19 @@ function getIpAddress() {
 
 function logToFile(message) {
     if (!process.env.DEBUG == "true") return;
+
+    // TODO: add size checker to clear file if it gets to big
+
+    // create dir
+    const appPath = path.join(getAppDataPath(), getCurrentDirectoryName());
+
+    if (!existsSync(appPath)) {
+        mkdirSync(appPath);
+    }
     
-    const logPath = path.join(process.pkg ? path.dirname(process.execPath) : process.cwd(), 'server.log');
+    const logPath = path.join(appPath, 'server.log');
     appendFileSync(logPath, `${new Date().toISOString()} - ${message}\n`);
 }
-
 
 /**
  * Retrieves settings from a JSON file and processes them.
@@ -45,15 +74,17 @@ function logToFile(message) {
  *                   - audioPaths: An array of audio paths. Empty if not specified in settings.
  */
 function getSettings() {
-    // Default path to settings.json (can be overridden by an environment variable)
-    
-    const runningDir = process.pkg ? path.dirname(process.execPath) : process.cwd();
-    
+    // create dir
+    const appPath = path.join(getAppDataPath(), getCurrentDirectoryName());
 
-    const settingsPath = path.join(runningDir, "settings.json");
+    if (!existsSync(appPath)) {
+        mkdirSync(appPath);
+    }
+
+    const settingsPath = path.join(appPath, "settings.json");
     
     // Add logging
-    console.log(`Reading settings from: ${settingsPath}`);
+    logToFile(`Reading settings from: ${settingsPath}`);
 
     let allowList = [];
 
@@ -87,6 +118,7 @@ function getSettings() {
             key: settings.key || key,
         };
     } catch (error) {
+        logToFile(`Failed to read settings: ${error.message}`);
         // Create a new settings.json with default values if it doesn't exist
         const defaultSettings = {
             allowList,
@@ -106,10 +138,14 @@ function getSettings() {
 }
 
 function updateSettings(newSettings) {
-    // Default path to settings.json (can be overridden by an environment variable)
-    const runningDir = process.pkg ? path.dirname(process.execPath) : process.cwd();
+    // create dir
+    const appPath = path.join(getAppDataPath(), getCurrentDirectoryName());
 
-    const settingsPath = path.join(runningDir, "settings.json");
+    if (!existsSync(appPath)) {
+        mkdirSync(appPath);
+    }
+
+    const settingsPath = path.join(appPath, "settings.json");
 
     const oldSettings = getSettings();
 
@@ -121,10 +157,10 @@ function updateSettings(newSettings) {
     try {
         writeFileSync(settingsPath, JSON.stringify(updatedSettings, null, 2), "utf-8");
 
-        console.log(`Updated settings: ${JSON.stringify(updatedSettings, null, 2)}`);
+        logToFile(`Updated settings: ${JSON.stringify(updatedSettings, null, 2)}`);
         return true;
     } catch (error) {
-        console.log("`Failed to update settings: ${error.message}`")
+        logToFile("`Failed to update settings: ${error.message}`")
         return false;
     }
 }
@@ -134,4 +170,6 @@ module.exports = {
     logToFile,
     getSettings,
     updateSettings,
+    getCurrentDirectoryName,
+    getAppDataPath
 };
