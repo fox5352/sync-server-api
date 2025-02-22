@@ -50,8 +50,18 @@ function logToFile(message) {
 
     // TODO: add size checker to clear file if it gets to big
 
-    // create dir
-    const appPath = path.join(getAppDataPath(), getCurrentDirectoryName());
+    let appPath;
+
+    // Check the operating system
+    if (os.platform() === 'win32') {
+        // Windows-specific path (keep your original logic)
+        appPath = path.join(getAppDataPath(), getCurrentDirectoryName());
+    } else {
+        // Linux-specific path (user-writable directory)
+        const homeDir = os.homedir(); // Get the home directory
+        
+        appPath = path.join(homeDir, '.local', 'share', 'sync-server-api');
+    }
 
     if (!existsSync(appPath)) {
         mkdirSync(appPath);
@@ -75,7 +85,19 @@ function logToFile(message) {
  */
 function getSettings() {
     // create dir
-    const appPath = path.join(getAppDataPath(), getCurrentDirectoryName());
+
+    let appPath;
+
+    // Check the operating system
+    if (os.platform() === 'win32') {
+        // Windows-specific path (keep your original logic)
+        appPath = path.join(getAppDataPath(), getCurrentDirectoryName());
+    } else {
+        // Linux-specific path (user-writable directory)
+        const homeDir = os.homedir(); // Get the home directory
+        
+        appPath = path.join(homeDir, '.local', 'share', 'sync-server-api');
+    }
 
     if (!existsSync(appPath)) {
         mkdirSync(appPath);
@@ -138,8 +160,19 @@ function getSettings() {
 }
 
 function updateSettings(newSettings) {
-    // create dir
-    const appPath = path.join(getAppDataPath(), getCurrentDirectoryName());
+
+    let appPath;
+
+    // Check the operating system
+    if (os.platform() === 'win32') {
+        // Windows-specific path (keep your original logic)
+        appPath = path.join(getAppDataPath(), getCurrentDirectoryName());
+    } else {
+        // Linux-specific path (user-writable directory)
+        const homeDir = os.homedir(); // Get the home directory
+        
+        appPath = path.join(homeDir, '.local', 'share', 'sync-server-api');
+    }
 
     if (!existsSync(appPath)) {
         mkdirSync(appPath);
