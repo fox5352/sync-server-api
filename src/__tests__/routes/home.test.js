@@ -17,7 +17,22 @@ describe('GET /', () => {
         {
           "path": "/api/:filetype",
           "desc": "shows files of a given type",
-          "methods": ["GET"]
+          "methods": ["GET", "POST"]
+        },
+        {
+          "desc": "retrieves a specific file",
+           "methods": [
+             "GET",
+             "POST",
+           ],
+           "path": "/api/:filetype/file",
+        },{
+          "desc": "updates system settings",
+           "methods": [
+             "GET",
+             "POST",
+           ],
+           "path": "/api/settings",
         }
       ]
     });
