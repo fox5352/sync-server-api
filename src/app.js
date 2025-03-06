@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const morgan = require("morgan");
 
 const { getSettings, getCurrentDirectoryName, logToFile } = require("./lib/utils");
 
@@ -17,9 +18,10 @@ if (SETTINGS.imagePaths.length == 0) logToFile("imagePaths not configured in set
 
 const app = express();
 
+app.use(morgan("combined"))
+
 app.use(cors({
     origin: "*",
-    optionsSuccessStatus: 200,
 }))
 
 // Add this middleware to parse JSON body

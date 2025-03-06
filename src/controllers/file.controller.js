@@ -7,8 +7,10 @@ async function GET(req, res) {
     const filetype = req.params.filetype;
     const { name, path: queryPath } = req.query
 
+    const decodedName = decodeURIComponent(name);
+    const decodedPath = decodeURIComponent(queryPath)
 
-    if (!name || !queryPath) {
+    if (!decodedName || !decodedPath) {
         res.status(400).json({ message: "Invalid request payload requires both name and path in query" })
     }
 
@@ -26,9 +28,9 @@ async function GET(req, res) {
 
             for (const file of files) {
 
-                if (file.name.toLowerCase().includes(name)) {
+                if (file.name == decodedName || file.name.toLowerCase().includes(decodedName)) {
 
-                    if (file.path == queryPath) {
+                    if (file.path == decodedPath) {
                         const metaData = await getFileMetadata(file.path, filetype);
                         const fileBuffer = await readFileData(file.path);
 
