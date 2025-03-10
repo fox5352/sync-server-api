@@ -9,43 +9,44 @@ function getCurrentDirectoryName() {
 
 function getAppDataPath() {
 
-  const homedir = os.homedir();
+    const homedir = os.homedir();
 
-  if (process.platform === 'win32') {
+    if (process.platform === 'win32') {
 
-    return `${homedir}\\AppData\\Roaming`;
+        return `${homedir}\\AppData\\Roaming`;
 
-  } else {
+    } else {
 
-    return `${homedir}/.config`;
+        return `${homedir}/.config`;
 
-  }
+    }
 
 }
 
 function getIpAddress() {
 
-  const interfaces = os.networkInterfaces();
+    const interfaces = os.networkInterfaces();
 
-  for (const key in interfaces) {
+    for (const key in interfaces) {
 
-    for (const details of interfaces[key]) {
+        for (const details of interfaces[key]) {
 
-      if (details.family === 'IPv4' && !details.internal) {
+            if (details.family === 'IPv4' && !details.internal) {
 
-        return details.address;
+                return details.address;
 
-      }
+            }
+
+        }
 
     }
 
-  }
-
-  return 'No IPv4 address found';
+    return 'No IPv4 address found';
 
 }
 
 function logToFile(message) {
+    console.log(message);
     if (!process.env.DEBUG == "true") return;
 
     // TODO: add size checker to clear file if it gets to big
@@ -59,25 +60,25 @@ function logToFile(message) {
     } else {
         // Linux-specific path (user-writable directory)
         const homeDir = os.homedir(); // Get the home directory
-        
+
         appPath = path.join(homeDir, '.local', 'share', 'sync-server-api');
     }
 
     if (!existsSync(appPath)) {
         mkdirSync(appPath);
     }
-    
+
     const logPath = path.join(appPath, 'server.log');
     appendFileSync(logPath, `${new Date().toISOString()} - ${message}\n`);
 }
 
 /**
  * Retrieves settings from a JSON file and processes them.
- * 
+ *
  * This function reads a 'settings.json' file from the parent directory or a custom path,
  * parses its contents, and extracts specific settings. If certain settings
  * are not present in the file, empty arrays are used as default values.
- * 
+ *
  * @returns {Object} An object containing processed settings:
  *                   - allowList: An array of allowed items. Empty if not specified in settings.
  *                   - imagePaths: An array of image paths. Empty if not specified in settings.
@@ -95,7 +96,7 @@ function getSettings() {
     } else {
         // Linux-specific path (user-writable directory)
         const homeDir = os.homedir(); // Get the home directory
-        
+
         appPath = path.join(homeDir, '.local', 'share', 'sync-server-api');
     }
 
@@ -104,7 +105,7 @@ function getSettings() {
     }
 
     const settingsPath = path.join(appPath, "settings.json");
-    
+
     // Add logging
     logToFile(`Reading settings from: ${settingsPath}`);
 
@@ -117,7 +118,7 @@ function getSettings() {
     let audioExt = ["mp3"];
 
     let videoPaths = [];
-    let videoExt= ["mkv", "mp4"];
+    let videoExt = ["mkv", "mp4"];
 
     let server = {
         host: "0.0.0.0",
@@ -127,7 +128,7 @@ function getSettings() {
 
     try {
         const settings = JSON.parse(readFileSync(settingsPath, "utf-8"));
-    
+
         return {
             allowList: settings.allowList || allowList,
             imagePaths: settings.imagePaths || imagePaths,
@@ -170,7 +171,7 @@ function updateSettings(newSettings) {
     } else {
         // Linux-specific path (user-writable directory)
         const homeDir = os.homedir(); // Get the home directory
-        
+
         appPath = path.join(homeDir, '.local', 'share', 'sync-server-api');
     }
 
@@ -183,8 +184,8 @@ function updateSettings(newSettings) {
     const oldSettings = getSettings();
 
     const updatedSettings = {
-       ...oldSettings,
-       ...newSettings,
+        ...oldSettings,
+        ...newSettings,
     };
 
     try {

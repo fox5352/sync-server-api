@@ -18,21 +18,21 @@ async function getMimeType(buffer) {
 
     // Get first 4 bytes as hex
     const hex = buffer.slice(0, 4).toString('hex').toLowerCase();
-    
+
     for (const [signature, mimeType] of Object.entries(signatures)) {
         if (hex.startsWith(signature.toLowerCase())) {
             return mimeType;
         }
     }
-    
+
     return 'application/octet-stream';
 }
 
 async function getAudioDuration(path) {
     try {
-        
+
         const metaData = await parseFile(path)
-        
+
 
         return {
             duration: metaData.format.duration,
@@ -44,15 +44,15 @@ async function getAudioDuration(path) {
     }
 }
 
-async function generateThumbnailBuffer(imagePath, width=155, height=155) {
+async function generateThumbnailBuffer(imagePath, width = 155, height = 155) {
     try {
         const file = Buffer.from(await fs.readFile(imagePath));
 
         return file;
-  } catch (err) {
-    logToFile('Error creating thumbnail:', err);
-    return null; // Re-throw the error for handling elsewhere if needed.
-  }
+    } catch (err) {
+        logToFile('Error creating thumbnail:', err);
+        return null; // Re-throw the error for handling elsewhere if needed.
+    }
 }
 
 async function getFileMetadata(filePath, type) {
@@ -65,9 +65,9 @@ async function getFileMetadata(filePath, type) {
             modified: stats.mtime
         };
 
-        // Generate thumbnails for images and videos 
+        // Generate thumbnails for images and videos
         // FIX: impl image processing package
-        if (type == "image") {            
+        if (type == "image") {
             const thumbnailBuffer = await generateThumbnailBuffer(filePath);
 
             if (thumbnailBuffer) {
@@ -108,7 +108,7 @@ async function readFileData(filePath) {
 
         return fileData;
     } catch (error) {
-        logToFile("Error reading file:", error);        
+        logToFile("Error reading file:", error);
         return null;
     }
 }
@@ -129,7 +129,7 @@ async function getFiles(dirPath) {
         if (!dirPath) {
             throw new Error("Directory path is required");
         }
-        
+
 
         const entries = await fs.readdir(dirPath, { withFileTypes: true });
 
@@ -160,8 +160,7 @@ async function writeFile(dirPath, name, extension, data) {
 
         const fullPath = path.join(dirPath, `${name}.${extension}`);
 
-        // The key change: specify 'binary' or 'buffer' encoding
-        await fs.writeFile(fullPath, data, { encoding: 'binary' }); // Or { encoding: 'buffer' }
+        await fs.writeFile(fullPath, new Uint8Array(data));
 
         return true;
     } catch (error) {

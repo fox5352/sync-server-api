@@ -25,7 +25,7 @@ app.use(cors({
 }))
 
 // Add this middleware to parse JSON body
-app.use(express.json());
+app.use(express.json({ limit: "2gb" }));
 app.use(express.urlencoded({ extended: true }));
 
 // ------------------- sync route -------------------

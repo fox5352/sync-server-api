@@ -89,12 +89,18 @@ async function POST(req, res) {
         } else if (filetype == "image") {
             // TODO: add path select bt query in future
             await writeFile(SETTINGS.imagePaths[0], name, ext, data)
+        } else if (filetype == "video") {
+            // TODO: add path select bt query in future
+            await writeFile(SETTINGS.videoPaths[0], name, ext, data)
+        } else {
+            res.status(403).json({ message: "Invalid file type" });
         }
 
         return res.json({ message: "file saved successfully" })
 
     } catch (error) {
-        logToFile(`failed to save ${filetype} ${error.message}`);
+        console.error(error)
+        //logToFile(`failed to save ${filetype} ${error.message}`);
 
         res.status(500).json({ message: "failed to save file" })
     }
