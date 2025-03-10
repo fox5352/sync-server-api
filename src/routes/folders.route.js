@@ -1,6 +1,6 @@
 const { Router } = require("express");
 
-const { GET } =require("../controllers/folders.controller.js");
+const { GET } = require("../controllers/folders.controller.js");
 
 const folderRouter = Router();
 

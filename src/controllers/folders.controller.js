@@ -1,26 +1,23 @@
-const osPath = require("path");
 const { getSettings } = require("../lib/utils.js");
 
-const SETTINGS = getSettings();
 
-async function GET(req,res) {
+async function GET(req, res) {
+    const SETTINGS = getSettings();
+
     const allowed = SETTINGS.allowList;
 
-    let data = allowed.map(filetype=>{
+    let data = allowed.map(filetype => {
         let buffer;
         switch (filetype) {
             case "audio":
-                buffer = SETTINGS.audioPaths.map(path=>{
-                    if (path == "./") {
-                        return osPath.basename(process.cwd())
-                    }else {
-                        return osPath.basename(path)
-                    }
-                })
+                buffer = SETTINGS.audioPaths;
                 break;
             case "image":
-                buffer = SETTINGS.imagePaths
+                buffer = SETTINGS.imagePaths;
                 break
+            case "video":
+                buffer = SETTINGS.videoPaths;
+                break;
             default:
                 break;
         }

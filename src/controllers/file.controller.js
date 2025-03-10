@@ -1,9 +1,10 @@
 const { getFiles, readFileData, getFileMetadata } = require("../lib/fileManagement");
 const { getSettings } = require("../lib/utils");
 
-const SETTINGS = getSettings();
 
 async function GET(req, res) {
+    const SETTINGS = getSettings();
+
     const filetype = req.params.filetype;
     const { name, path: queryPath } = req.query
 
