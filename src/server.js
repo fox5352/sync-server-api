@@ -1,20 +1,24 @@
-const http = require("http");
+ const fs = require("fs");
+const path = require("path");
+const https = require("https");
 const { app } = require("./app.js");
-const { getSettings, getIpAddress } = require("./lib/utils.js")
-
+const { getSettings, getIpAddress } = require("./lib/utils.js");
+const { KEY, CERT } = require("./certs/cert.js");
 
 const SETTINGS = getSettings();
 
-// TODO: get env from process called token
 
-const server = http.createServer(app);
+const options = {
+  key: Buffer.from(KEY, 'base64').toString('utf-8'),
+  cert: Buffer.from(CERT, "base64").toString("utf-8"),
+};
 
-server.listen(SETTINGS.server.port, SETTINGS.server.host, () => {
+https.createServer(options, app).listen(SETTINGS.server.port, SETTINGS.server.host, () => {
     let address = '';
     if (SETTINGS.server.host == "0.0.0.0") {
-        address = `http://${getIpAddress()}:${SETTINGS.server.port}`
+        address = `https://${getIpAddress()}:${SETTINGS.server.port}`;
     } else {
-        address = `http://localhost:${SETTINGS.server.port}`
+        address = `https://localhost:${SETTINGS.server.port}`;
     }
     console.log(`Server is running on ${address}`);
-})
+});
