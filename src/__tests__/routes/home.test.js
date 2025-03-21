@@ -1,12 +1,16 @@
 const { app } = require("../../app");
 const request = require('supertest');
+const { decrypt} = require("./utils");
 
 
 describe('GET /', () => {
   it('should return a response object with available routes', async () => {
+    
+    const token = 'testing';
+
     const response = await request(app).get('/');
     expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual({
+    expect(decrypt(response.body, token)).toEqual({
       "message": "success",
       "routes": [
         {

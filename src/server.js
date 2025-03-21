@@ -1,11 +1,9 @@
 const http = require("http");
 const { app } = require("./app.js");
 const { getSettings, getIpAddress } = require("./lib/utils.js")
-
+const { Server } = require("socket.io");
 
 const SETTINGS = getSettings();
-
-// TODO: get env from process called token
 
 const server = http.createServer(app);
 

@@ -1,44 +1,46 @@
 const { app } = require("../../app");
 const request = require('supertest');
 const { updateSettings } = require("../../lib/utils");
+const { encrypt, decrypt } = require("./utils")
 
 
 describe('API Test in settings route', () => {
     const block = request(app);
 
-    const token = 'Bearer testing';
+    const token = 'testing';
 
-    test('GET /api/settings', async() => {
-        const response = await block.get("/api/settings").set('Authorization', token);
+    test('GET /api/settings', async() => {;
 
         expect(response.status).toBe(200);
 
-        expect(response.body).toHaveProperty('data');
-        expect(response.body).toHaveProperty('message');
+        const body = decrypt(response.body, token);
 
-        expect(response.body.data).toHaveProperty('settings');
-        expect(response.body.message).toBe("Settings fetched successfully");
+        expect(body).toHaveProperty('data');
+        expect(body).toHaveProperty('message');
 
-        expect(response.body.data.settings).toHaveProperty('allowList');
-        expect(response.body.data.settings.allowList).toBeInstanceOf(Array);
+        expect(body.data).toHaveProperty('settings');
+        expect(body.message).toBe("Settings fetched successfully");
 
-        expect(response.body.data.settings).toHaveProperty('imagePaths');
-        expect(response.body.data.settings.imagePaths).toBeInstanceOf(Array);
+        expect(body.data.settings).toHaveProperty('allowList');
+        expect(body.data.settings.allowList).toBeInstanceOf(Array);
 
-        expect(response.body.data.settings).toHaveProperty('audioPaths');
-        expect(response.body.data.settings.audioPaths).toBeInstanceOf(Array);
+        expect(body.data.settings).toHaveProperty('imagePaths');
+        expect(body.data.settings.imagePaths).toBeInstanceOf(Array);
 
-        expect(response.body.data.settings).toHaveProperty('imageExt');
+        expect(body.data.settings).toHaveProperty('audioPaths');
+        expect(body.data.settings.audioPaths).toBeInstanceOf(Array);
 
-        expect(response.body.data.settings).toHaveProperty('audioExt');
-        expect(response.body.data.settings.audioExt).toBeInstanceOf(Array);
+        expect(body.data.settings).toHaveProperty('imageExt');
 
-        expect(response.body.data.settings).toHaveProperty('server');
-        expect(response.body.data.settings.server).toBeInstanceOf(Object);
+        expect(body.data.settings).toHaveProperty('audioExt');
+        expect(body.data.settings.audioExt).toBeInstanceOf(Array);
 
-        expect(response.body.data.settings.server).toHaveProperty('host');
+        expect(body.data.settings).toHaveProperty('server');
+        expect(body.data.settings.server).toBeInstanceOf(Object);
+
+        expect(body.data.settings.server).toHaveProperty('host');
         
-        expect(response.body.data.settings.server).toHaveProperty('port');
+        expect(body.data.settings.server).toHaveProperty('port');
     });
 
     it('POST /api/settings - Update all settings', async () => {
@@ -67,21 +69,25 @@ describe('API Test in settings route', () => {
 
         const response = await block
             .post('/api/settings')
-            .set('Authorization', token)
-            .send(updatedSettings);
+            .send(encrypt(updatedSettings, token));
 
         expect(response.status).toBe(200);
-        expect(response.body).toHaveProperty('data');
-        expect(response.body).toHaveProperty('message');
-        expect(response.body.message).toBe("Settings updated successfully");
+
+        const body = decrypt(response.body, token);
+
+        expect(body).toHaveProperty('data');
+        expect(body).toHaveProperty('message');
+        expect(body.message).toBe("Settings updated successfully");
 
         // Important: Verify the actual database or data store
         const getResponse = await block // Get the settings again
-            .get('/api/settings')
-            .set('Authorization', token);
+            .get('/api/settings');
+
+            
+        const body2 = decrypt(getResponse.body, token);
 
         expect(getResponse.status).toBe(200);
-        expect(getResponse.body.data.settings).toEqual(updatedSettings.settings); // Deep comparison
+        expect(body2.data.settings).toEqual(updatedSettings.settings); // Deep comparison
 
     });
 
@@ -94,18 +100,21 @@ describe('API Test in settings route', () => {
 
         const response = await block
             .post('/api/settings')
-            .set('Authorization', token)
             .send(partialUpdate);
 
         expect(response.status).toBe(200);
-        expect(response.body.message).toBe("Settings updated successfully");
+
+        const body = decrypt(response.body, token);
+
+        expect(body.message).toBe("Settings updated successfully");
 
         const getResponse = await block
-            .get('/api/settings')
-            .set('Authorization', token);
+            .get('/api/settings');
+
+        const getbody = decrypt(getResponse.body, token);
 
         expect(getResponse.status).toBe(200);
-        expect(getResponse.body.data.settings.imageExt).toEqual(partialUpdate.settings.imageExt); // Check only the updated part
+        expect(getbody.data.settings.imageExt).toEqual(partialUpdate.settings.imageExt); // Check only the updated part
         // Add more assertions to check that other settings remain unchanged
     });
 
@@ -116,15 +125,15 @@ describe('API Test in settings route', () => {
 
         const response = await block
             .post('/api/settings')
-            .set('Authorization', token)
             .send(emptyUpdate);
 
+        const body = decrypt(response.body, token);
+
         expect(response.status).toBe(200);
-        expect(response.body.message).toBe("Settings updated successfully");
+        expect(body.message).toBe("Settings updated successfully");
 
         const getResponse = await block
-            .get('/api/settings')
-            .set('Authorization', token);
+            .get('/api/settings');
 
         expect(getResponse.status).toBe(200);
         // Add assertions to check that the settings remain unchanged after empty update

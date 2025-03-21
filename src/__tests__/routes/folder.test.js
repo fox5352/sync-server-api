@@ -1,19 +1,23 @@
 const { app } = require("../../app");
 const request = require('supertest');
+const { decrypt } = require("./utils")
 
 describe('API Test in folders route', () => { 
     const block =  request(app);
+    const token = 'testing';
 
     test('GET /api/folders', async () => { 
         const response = await block.get("/api/folders");
 
         expect(response.status).toBe(200);
 
-        expect(response.body).toHaveProperty('data');
-        expect(response.body).toHaveProperty('message');
+        const body = decrypt(response.body, token);
 
-        expect(response.body.data).toBeInstanceOf(Array);
-        expect(response.body.message).toBe("Successfully fetched folders");
+        expect(body).toHaveProperty('data');
+        expect(body).toHaveProperty('message');
+
+        expect(body.data).toBeInstanceOf(Array);
+        expect(body.message).toBe("Successfully fetched folders");
     })
 
     test('POST /api/folders',async () => {

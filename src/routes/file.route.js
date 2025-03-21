@@ -1,5 +1,4 @@
 const { Router } = require("express");
-const { getFiles, readFileData, getFileMetadata } = require("../lib/fileManagement");
 
 const { GET } = require("../controllers/file.controller");
 

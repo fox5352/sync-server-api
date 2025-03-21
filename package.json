@@ -18,11 +18,13 @@
   "description": "",
   "dependencies": {
     "cors": "^2.8.5",
+    "crypto-js": "^4.2.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "morgan": "^1.10.0",
     "music-metadata": "^7.14.0",
     "nodemon": "^3.1.9",
+    "socket.io": "^4.8.1",
     "yargs": "^17.7.2"
   },
   "devDependencies": {

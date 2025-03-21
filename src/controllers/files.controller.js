@@ -2,8 +2,6 @@ const { getSettings } = require("../lib/utils");
 const { getFiles, writeFile, getFileMetadata } = require("../lib/fileManagement");
 const { logToFile } = require("../lib/utils");
 
-
-
 // helpers
 /**
  * @param {string} path

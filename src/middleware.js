@@ -1,4 +1,4 @@
-const { getSettings } =require("./lib/utils.js");
+const { getSettings } = require("./lib/utils.js");
 
 const SETTINGS = getSettings();
 
