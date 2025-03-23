@@ -1,15 +1,20 @@
 const http = require("http");
 const { app } = require("./app.js");
 const { getSettings, getIpAddress } = require("./lib/utils.js")
-const { Server } = require("socket.io");
 
 const SETTINGS = getSettings();
 
 const server = http.createServer(app);
 
-server.listen(SETTINGS.server.port, SETTINGS.server.host, () => {
+const MODE = process.env.DEBUG  == "true"? true : false;
+
+server.listen(SETTINGS.server.port, MODE ? ("localhost"):(SETTINGS.server.host), () => {
     let address = '';
-    if (SETTINGS.server.host == "0.0.0.0") {
+    if (MODE) {
+        console.log("server started in debug mode")
+        address = `http://localhost:${SETTINGS.server.port}`
+
+    } else if (SETTINGS.server.host == "0.0.0.0") {
         address = `http://${getIpAddress()}:${SETTINGS.server.port}`
     } else {
         address = `http://localhost:${SETTINGS.server.port}`

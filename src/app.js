@@ -2,7 +2,7 @@ require("dotenv").config();
 const cors = require("cors");
 const morgan = require("morgan");
 const express = require("express");
-const CryptoJs = require("crypto-js");
+const CryptoJS = require("crypto-js");
 
 const { getSettings, logToFile } = require("./lib/utils");
 
@@ -31,24 +31,52 @@ app.use(cors({
 app.use(express.json({ limit: "3gb" }));
 app.use(express.urlencoded({ extended: true }));
 
-// TODO: encrypt data as it leaves and decrypt as it enters using bcryptjs inside a middleware function
-app.use(async function(req,res,next) {
-    const originalJson = res.json.bind(res); // Preserve original function
+
+function encrypt(data, key) {
+    return CryptoJS.AES.encrypt(JSON.stringify(data), key).toString();    
+}
+
+function decrypt(data, key) {
+    try {
+        const bytes = CryptoJS.AES.decrypt(data, key);
+        const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
+        return decryptedData ? JSON.parse(decryptedData) : null;
+    } catch (error) {
+        return null; // Return null if decryption fails
+    }
+}
+
+app.use(async function(req, res, next) {
+    const TOKEN = process.env.TOKEN;
+
+    // Handle incoming data
+    if (req.body && req.body['encryptedData']) {        
+        try {
+            const decrypted = decrypt(req.body.encryptedData, TOKEN);
+            if (decrypted === null) throw new Error("Decryption failed");
+            
+            req.body = JSON.parse(decrypted);   
+
+        } catch (error) {
+            logToFile(`Error decrypting data: ${error.message}`);
+            return res.status(400).json({ message: "Invalid request payload, failed to decrypt." });
+        }
+    }
+
+    // Preserve original res.json function
+    const originalJson = res.json.bind(res);
 
     res.json = function (data) {
-        let newData = "";
-        if (typeof data === 'object') {
-            const encryptData = (data, key) => {
-                return CryptoJs.AES.encrypt(JSON.stringify(data), key).toString();
-            }
-            newData = encryptData(data, process.env.TOKEN);
+        try {
+            return originalJson(encrypt(data, TOKEN)); // Wrap in an object
+        } catch (error) {
+            return originalJson(encrypt({ message: "Error encrypting response." }, TOKEN));
         }
-
-        return originalJson(newData); // Call original method with modified data
     };
 
     next();
-})
+});
+
 
 // ------------------- sync route -------------------
 app.use("/", homeRouter);

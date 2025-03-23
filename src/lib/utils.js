@@ -1,6 +1,9 @@
+require("dotenv").config();
 const path = require("path");
 const os = require("os");
 const { readFileSync, writeFileSync, appendFileSync, existsSync, mkdirSync } = require("node:fs")
+
+const DEBUG = process.env.DEBUG == "true" ? true : false;
 
 function getCurrentDirectoryName() {
     const runningDir = process.pkg ? path.dirname(process.execPath) : process.cwd();
@@ -46,10 +49,9 @@ function getIpAddress() {
 }
 
 function logToFile(message) {
-    console.log(message);
-    if (!process.env.DEBUG == "true") return;
-
     // TODO: add size checker to clear file if it gets to big
+    if (DEBUG) return
+
 
     let appPath;
 
@@ -89,15 +91,21 @@ function getSettings() {
 
     let appPath;
 
-    // Check the operating system
-    if (os.platform() === 'win32') {
-        // Windows-specific path (keep your original logic)
-        appPath = path.join(getAppDataPath(), getCurrentDirectoryName());
-    } else {
-        // Linux-specific path (user-writable directory)
-        const homeDir = os.homedir(); // Get the home directory
+    if (DEBUG){
+        appPath = path.join(process.cwd());
+        console.log(appPath);
+        
+    }else {
+        // Check the operating system
+        if (os.platform() === 'win32') {
+            // Windows-specific path (keep your original logic)
+            appPath = path.join(getAppDataPath(), getCurrentDirectoryName());
+        } else {
+            // Linux-specific path (user-writable directory)
+            const homeDir = os.homedir(); // Get the home directory
 
-        appPath = path.join(homeDir, '.local', 'share', 'sync-server-api');
+            appPath = path.join(homeDir, '.local', 'share', 'sync-server-api');
+        }
     }
 
     if (!existsSync(appPath)) {
@@ -124,6 +132,7 @@ function getSettings() {
         host: "0.0.0.0",
         port: 9090,
     }
+    
     let key = undefined;
 
     try {
@@ -161,18 +170,21 @@ function getSettings() {
 }
 
 function updateSettings(newSettings) {
-
     let appPath;
 
-    // Check the operating system
-    if (os.platform() === 'win32') {
-        // Windows-specific path (keep your original logic)
-        appPath = path.join(getAppDataPath(), getCurrentDirectoryName());
-    } else {
-        // Linux-specific path (user-writable directory)
-        const homeDir = os.homedir(); // Get the home directory
+    if (DEBUG){
+        appPath = path.join(process.cwd());
+    }else {
+        // Check the operating system
+        if (os.platform() === 'win32') {
+            // Windows-specific path (keep your original logic)
+            appPath = path.join(getAppDataPath(), getCurrentDirectoryName());
+        } else {
+            // Linux-specific path (user-writable directory)
+            const homeDir = os.homedir(); // Get the home directory
 
-        appPath = path.join(homeDir, '.local', 'share', 'sync-server-api');
+            appPath = path.join(homeDir, '.local', 'share', 'sync-server-api');
+        }
     }
 
     if (!existsSync(appPath)) {
