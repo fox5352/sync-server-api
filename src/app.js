@@ -4,7 +4,7 @@ const morgan = require("morgan");
 const express = require("express");
 const CryptoJS = require("crypto-js");
 
-const { getSettings, logToFile } = require("./lib/utils");
+const { getSettings, logToFile, decrypt, encrypt } = require("./lib/utils");
 
 // routers
 const { homeRouter, folderRouter, filesRouter, settingsRouter } = require("./routes/");
@@ -32,19 +32,6 @@ app.use(express.json({ limit: "3gb" }));
 app.use(express.urlencoded({ extended: true }));
 
 
-function encrypt(data, key) {
-    return CryptoJS.AES.encrypt(JSON.stringify(data), key).toString();    
-}
-
-function decrypt(data, key) {
-    try {
-        const bytes = CryptoJS.AES.decrypt(data, key);
-        const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
-        return decryptedData ? JSON.parse(decryptedData) : null;
-    } catch (error) {
-        return null; // Return null if decryption fails
-    }
-}
 
 app.use(async function(req, res, next) {
     const TOKEN = process.env.TOKEN;
