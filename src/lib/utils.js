@@ -2,6 +2,7 @@ require("dotenv").config();
 const path = require("path");
 const os = require("os");
 const { readFileSync, writeFileSync, appendFileSync, existsSync, mkdirSync } = require("node:fs")
+const CryptoJS = require("crypto-js");
 
 const DEBUG = process.env.DEBUG == "true" ? true : false;
 
@@ -234,6 +235,15 @@ function decrypt(data, key) {
     }
 }
 
+function base64ToUint8Array(base64) {
+  const binaryString = atob(base64);
+  const uint8Array = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    uint8Array[i] = binaryString.charCodeAt(i);
+  }
+  return uint8Array;
+}
+
 module.exports = {
     getIpAddress,
     logToFile,
@@ -242,5 +252,6 @@ module.exports = {
     getCurrentDirectoryName,
     getAppDataPath,
     encrypt,
-    decrypt
+    decrypt,
+    base64ToUint8Array
 };

@@ -168,6 +168,15 @@ async function writeFile(dirPath, name, extension, data) {
     }
 }
 
+async function checkFileExists(dirPath, name, extension) {
+    try {
+        await fs.access(path.join(dirPath, `${name}.${extension}`));
+        return true;
+    } catch (error) {
+        return false;        
+    }
+}
+
 async function appendToFile(dirPath, name, type, extension, data) {    
     try {
         if (!name || !extension) {
@@ -194,8 +203,10 @@ async function appendToFile(dirPath, name, type, extension, data) {
                 encoding = "binary"
                 break;
         }
+
         await fs.appendFile(fullPath, buffer, {
-            encoding
+            encoding,
+            extension
         })
 
         return true;        
@@ -210,5 +221,6 @@ module.exports = {
     getFiles,
     writeFile,
     appendToFile,
-    getFileMetadata
+    getFileMetadata,
+    checkFileExists
 }
