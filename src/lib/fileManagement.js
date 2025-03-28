@@ -168,10 +168,59 @@ async function writeFile(dirPath, name, extension, data) {
     }
 }
 
+async function checkFileExists(dirPath, name, extension) {
+    try {
+        await fs.access(path.join(dirPath, `${name}.${extension}`));
+        return true;
+    } catch (error) {
+        return false;        
+    }
+}
+
+async function appendToFile(dirPath, name, type, extension, data) {    
+    try {
+        if (!name || !extension) {
+            throw new Error("Name and extension are required");
+        }
+        if (!data) {
+            throw new Error("Data is required");
+        }
+        if (!dirPath) {
+            throw new Error("Directory path is required");
+        }
+
+        const fullPath = path.join(dirPath, `${name}.${extension}`);
+
+        let buffer = ""
+        let encoding = "binary"
+        switch (type) {
+            case "document":
+                buffer = data.toString()
+                encoding = "utf-8"
+                break;
+            default:
+                buffer = new Uint8Array(data)
+                encoding = "binary"
+                break;
+        }
+
+        await fs.appendFile(fullPath, buffer, {
+            encoding,
+            extension
+        })
+
+        return true;        
+    } catch (error) {
+        throw new Error(`Failed to append ${name} to ${fullPath}: ${error.message}`);
+    }
+}
+
 
 module.exports = {
     readFileData,
     getFiles,
     writeFile,
-    getFileMetadata
+    appendToFile,
+    getFileMetadata,
+    checkFileExists
 }

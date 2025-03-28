@@ -2,6 +2,7 @@ require("dotenv").config();
 const path = require("path");
 const os = require("os");
 const { readFileSync, writeFileSync, appendFileSync, existsSync, mkdirSync } = require("node:fs")
+const CryptoJS = require("crypto-js");
 
 const DEBUG = process.env.DEBUG == "true" ? true : false;
 
@@ -75,16 +76,24 @@ function logToFile(message) {
 }
 
 /**
- * Retrieves settings from a JSON file and processes them.
+* Retrieves settings from a JSON file and processes them.
  *
  * This function reads a 'settings.json' file from the parent directory or a custom path,
  * parses its contents, and extracts specific settings. If certain settings
  * are not present in the file, empty arrays are used as default values.
  *
- * @returns {Object} An object containing processed settings:
- *                   - allowList: An array of allowed items. Empty if not specified in settings.
- *                   - imagePaths: An array of image paths. Empty if not specified in settings.
- *                   - audioPaths: An array of audio paths. Empty if not specified in settings.
+    * @returns {Object} An object containing the settings.
+    * @property {string[]} allowList - List of allowed file types.
+    * @property {string[]} imagePaths - List of paths to search for images.
+    * @property {string[]} imageExt - List of image file extensions.
+    * @property {string[]} audioPaths - List of paths to search for audio files.
+    * @property {string[]} audioExt - List of audio file extensions.
+    * @property {string[]} videoPaths - List of paths to search for video files.
+    * @property {string[]} videoExt - List of video file extensions.
+    * @property {Object} server - Server settings.
+    * @property {string} server.host - The host to use for the server.
+    * @property {number} server.port - The port to use for the server.
+    * @property {string} key - The encryption key.
  */
 function getSettings() {
     // create dir
@@ -211,11 +220,38 @@ function updateSettings(newSettings) {
     }
 }
 
+
+function encrypt(data, key) {
+    return CryptoJS.AES.encrypt(JSON.stringify(data), key).toString();    
+}
+
+function decrypt(data, key) {
+    try {
+        const bytes = CryptoJS.AES.decrypt(data, key);
+        const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
+        return decryptedData ? JSON.parse(decryptedData) : null;
+    } catch (error) {
+        return null; // Return null if decryption fails
+    }
+}
+
+function base64ToUint8Array(base64) {
+  const binaryString = atob(base64);
+  const uint8Array = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    uint8Array[i] = binaryString.charCodeAt(i);
+  }
+  return uint8Array;
+}
+
 module.exports = {
     getIpAddress,
     logToFile,
     getSettings,
     updateSettings,
     getCurrentDirectoryName,
-    getAppDataPath
+    getAppDataPath,
+    encrypt,
+    decrypt,
+    base64ToUint8Array
 };
