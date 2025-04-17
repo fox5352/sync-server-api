@@ -169,10 +169,10 @@ io.on("connection", (socket)=>{
         
 
         try {
-            for (const index of Object.keys(data?.buffer)) {
-                const res = await appendToFile(selectedPath, nameWithoutExtension, fileType, extension, data?.buffer[index]);   
+            for (let idx = 0; data &&  idx < data.endIndex; idx++) {
+                const res = await appendToFile(selectedPath, nameWithoutExtension, fileType, extension, data?.buffer[idx]);
                 
-                if (!res) throw new Error("failed to write file");
+                if (!res) throw new Error("failed to write file");                
             }
             
             // TODO: maybe add a finish event
