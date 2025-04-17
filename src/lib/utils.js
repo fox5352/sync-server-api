@@ -244,6 +244,14 @@ function base64ToUint8Array(base64) {
   return uint8Array;
 }
 
+function splitByLastDot(str) {
+  const lastDotIndex = str.lastIndexOf(".");
+  if (lastDotIndex === -1) return [str]; // no dot found
+  const before = str.slice(0, lastDotIndex);
+  const after = str.slice(lastDotIndex + 1);
+  return [before, after];
+}
+
 module.exports = {
     getIpAddress,
     logToFile,
@@ -253,5 +261,5 @@ module.exports = {
     getAppDataPath,
     encrypt,
     decrypt,
-    base64ToUint8Array
+    base64ToUint8Array,splitByLastDot
 };
