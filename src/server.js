@@ -18,7 +18,7 @@ const io = new Server(server, {
 
 if (process.env.TOKEN == undefined) throw new Error("token not found");
 
-io.on("connection", (socket)=>{
+io.on("connection", (socket) => {
     let handshakeDetails = socket.handshake;
 
     const origin = handshakeDetails.headers.origin;
@@ -26,63 +26,51 @@ io.on("connection", (socket)=>{
     logToFile(`${origin} connected at ${timestamp}`);
 
     let fileBuffer = {};
-    
-    socket.on("UPLOAD", async (obj)=>{
+
+    socket.on("UPLOAD", async (obj) => {
         let parsedObj;
 
         try {
             parsedObj = JSON.parse(obj);
-        } catch (error) {
-            console.error("Invalid JSON received");
-            socket.emit("error", "Invalid JSON format");
-            return;
-        }
-        
-        // if (!parsedObj.encryptedData) {
-        //     console.error("Missing encryptedData");
-        //     socket.emit("error", "Missing encryptedData field");
-        //     return;
-        // }
 
-        // const decryptedData = decrypt(parsedObj.encryptedData, process.env.TOKEN);
-
-        if (!parsedObj) {
-            console.error("Invalid data received");
-            return;
-        }
-
-        if (!parsedObj.id){
-            console.error("Invalid id data received");
-            return;
-        }
-
-        const packetProperties = ["name", "type", "data", "packetIndex"];
-        
-        let errorMessage = "";
-
-        for (let i = 0; i < packetProperties.length; i++) {
-            const property = packetProperties[i]
-            if (!parsedObj[property] === undefined ) errorMessage += `${property}, `;
-        }
-
-        if (errorMessage.length > 0) {
-            console.error(`the following properties are missing the in packet ${errorMessage}`);
-            socket.emit("error", { id:parsedObj.id, message: `the following properties are missing the in packet ${errorMessage}`});
-            return;
-        }
-
-        const lastIndex = fileBuffer[parsedObj.id]?.endIndex > parsedObj.packetIndex? fileBuffer[parsedObj.id].endIndex : parsedObj.packetIndex;
-
-        fileBuffer[parsedObj.id] = {
-            name: parsedObj.name,
-            type:parsedObj.type,
-            endIndex: lastIndex,
-            buffer : {
-                ...fileBuffer[parsedObj.id]?.buffer,
-                [parsedObj.packetIndex]: parsedObj.data
+            if (!parsedObj) {
+                throw new Error("Invalid data received");
             }
+
+            if (!parsedObj.id) {
+                throw new Error("Invalid id data recived");
+            }
+
+            const packetProperties = ["name", "type", "data", "packetIndex"];
+
+            let errorMessage = "";
+
+            for (let i = 0; i < packetProperties.length; i++) {
+                const property = packetProperties[i]
+                if (!parsedObj[property] === undefined) errorMessage += `${property}, `;
+            }
+
+            if (errorMessage.length > 0) {
+                throw new Error(`the following properties are missing the in packet ${errorMessage}`)
+            }
+
+            const lastIndex = fileBuffer[parsedObj.id]?.endIndex > parsedObj.packetIndex ? fileBuffer[parsedObj.id].endIndex : parsedObj.packetIndex;
+
+
+            fileBuffer[parsedObj.id] = {
+                name: parsedObj.name,
+                type: parsedObj.type,
+                endIndex: lastIndex,
+                buffer: {
+                    ...fileBuffer[parsedObj.id]?.buffer,
+                    [parsedObj.packetIndex]: parsedObj.data
+                }
+            }
+
+        } catch (error) {
+            console.error(error);
+            socket.emit("error", { id: parsedObj.id, message: `${error}` });
         }
-        
     })
 
     socket.on("UPLOAD_COMPLETE", async (obj) => {
@@ -91,94 +79,77 @@ io.on("connection", (socket)=>{
 
         try {
             parsedObj = JSON.parse(obj);
-        } catch (error) {
-            console.error("Invalid JSON received");
-            socket.emit("error", "Invalid JSON format");
-            return;
-        }
 
-        if (!parsedObj) {
-            console.error("Invalid data received");
-            return;
-        }
-
-        if (!parsedObj.id){
-            console.error("Invalid id data received");
-            return;
-        }
-
-        const data = fileBuffer[parsedObj.id];
-        fileBuffer[parsedObj.id] = null;// clean up the buffer
-
-        if (!data) {
-            console.error("failed to retrieve data by id");
-            socket.emit("error", {id:parsedObj.id, message:"failed to retrieve data by id"});
-            return;
-        }
-
-        const [fileType, _] = data.type.split("/");
-
-        if (!fileType) {
-            console.error("invalid fileType");
-            socket.emit("error", {id: parsedObj.id, message:"invalid fileType"});
-            return;
-        }
-
-        // TODO: get path from user later
-        const pathType = `${fileType}Paths`;        
-
-        if (!SETTINGS[pathType]) {
-            console.error(`No paths found for file type ${fileType}`);
-            socket.emit("error", {id: parsedObj.id, message:`No paths found for file type ${fileType}`});
-            return;
-        }
-
-        let selectedPath = "";
-
-        if (data?.path) {
-            selectedPath = SETTINGS[pathType].find((val)=> {
-                return val == data?.path
-            });
-            
-            if (selectedPath.length == 0) {
-                console.error(`No valid path found for file type ${fileType} and path ${data?.path}`);
-                selectedPath = SETTINGS[pathType][0]
+            if (!parsedObj) {
+                throw new Error("Invalid data received");
             }
 
-        }else {
-            selectedPath = SETTINGS[pathType][0];
-        }
-
-        if (!selectedPath) {
-            console.error(`No valid path found for file type ${fileType}`);
-            socket.emit("error", {id: parsedObj.id, message:`No valid path found for file type ${data.name} ${fileType}`});
-            return;
-        }
-
-        
-        const [nameWithoutExtension, extension] = splitByLastDot(data.name);
-        
-        // check if file already exits
-        const exists = await checkFileExists(selectedPath, nameWithoutExtension, extension)           
-
-        if (exists) {
-            console.error("file already exists");                
-            socket.emit("error", `file already exist`)
-            return;
-        }
-        
-
-        try {
-            for (let idx = 0; data &&  idx < data.endIndex; idx++) {
-                const res = await appendToFile(selectedPath, nameWithoutExtension, fileType, extension, data?.buffer[idx]);
-                
-                if (!res) throw new Error("failed to write file");                
+            if (!parsedObj.id) {
+                throw new Error("Invalid id data received");
             }
-            
+
+            const data = fileBuffer[parsedObj.id];
+
+            if (!data) {
+                throw new Error("failed to retrieve data by id");
+            }
+
+            const [fileType, _] = data.type.split("/");
+
+            if (!fileType) {
+                throw new Error("invalid fileType");
+            }
+
+            // TODO: get path from user later
+            const pathType = `${fileType}Paths`;
+
+            if (!SETTINGS[pathType]) {
+                throw new Error(`No paths found for file type ${fileType}`);
+            }
+
+            let selectedPath = "";
+
+            if (parsedObj?.path) {
+                console.log("data path found", parsedObj?.path)
+                selectedPath = SETTINGS[pathType].find((val) => {
+                    return val == parsedObj?.path
+                });
+
+                if (selectedPath.length == 0) {
+                    console.error(`No valid path found for file type ${fileType} and path ${parsedObj?.path}`);
+                    selectedPath = SETTINGS[pathType][0]
+                }
+
+            } else {
+                console.log("default path selected")
+                selectedPath = SETTINGS[pathType][0];
+            }
+
+            if (!selectedPath) {
+                throw new Error(`No valid path found for file type ${fileType}`);
+            }
+
+            const [nameWithoutExtension, extension] = splitByLastDot(data.name);
+
+            // check if file already exits
+            const exists = await checkFileExists(selectedPath, nameWithoutExtension, extension)
+
+            if (exists) {
+                throw new Error("file already exists");
+            }
+
+            for (let idx = 0; data && idx < data.endIndex; idx++) {
+                const uint8Buffer = base64ToUint8Array(data.buffer[idx]);
+                const res = await appendToFile(selectedPath, nameWithoutExtension, fileType, extension, uint8Buffer);
+                if (!res) throw new Error("failed to write file");
+            }
+
+            fileBuffer[parsedObj.id] = null;// clean up the buffer
+
             // TODO: maybe add a finish event
         } catch (error) {
-            console.error(`failed to write file name:${data.name}:${obj.id}, error: ${error.message}`);            
-            return
+            console.error(error);
+            socket.emit("error", { id: parsedObj.id, message: `${error}` });
         }
 
     })
@@ -190,10 +161,10 @@ io.on("connection", (socket)=>{
 
 
 
-const MODE = process.env.DEBUG  === "true"? true : false;
+const MODE = process.env.DEBUG === "true" ? true : false;
 
 const SETTINGS = getSettings();
-server.listen(SETTINGS.server.port, MODE ? ("localhost"):(SETTINGS.server.host), () => {
+server.listen(SETTINGS.server.port, MODE ? ("localhost") : (SETTINGS.server.host), () => {
     let address = '';
 
     if (MODE) {

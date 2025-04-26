@@ -4,6 +4,18 @@ const fs = require("node:fs/promises");
 const { parseFile } = require("music-metadata");
 const { logToFile } = require("../lib/utils")
 
+function base64ToUint8Array(base64) {
+    const binaryString = atob(base64);
+    const length = binaryString.length;
+    const bytes = new Uint8Array(length);
+
+    for (let i = 0; i < length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    return bytes;
+}
+
 async function getMimeType(buffer) {
     // Magic numbers for common file types
     const signatures = {
@@ -173,11 +185,11 @@ async function checkFileExists(dirPath, name, extension) {
         await fs.access(path.join(dirPath, `${name}.${extension}`));
         return true;
     } catch (error) {
-        return false;        
+        return false;
     }
 }
 
-async function appendToFile(dirPath, name, type, extension, data) {    
+async function appendToFile(dirPath, name, type, extension, data) {
     try {
         if (!name || !extension) {
             throw new Error("Name and extension are required");
@@ -209,7 +221,7 @@ async function appendToFile(dirPath, name, type, extension, data) {
             extension
         })
 
-        return true;        
+        return true;
     } catch (error) {
         throw new Error(`Failed to append ${name} to ${fullPath}: ${error.message}`);
     }
@@ -222,5 +234,6 @@ module.exports = {
     writeFile,
     appendToFile,
     getFileMetadata,
-    checkFileExists
+    checkFileExists,
+    base64ToUint8Array
 }
